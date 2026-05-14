@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,viewport-fit=cover"
+    />
+    <title>Backend exercise idk</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script type="importmap">
+      {
+        "imports": {
+          "dayjs": "https://esm.sh/dayjs@1.11.9",
+          "dayjs/plugin/relativeTime": "https://esm.sh/dayjs@1.11.9/plugin/relativeTime"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div id="app">
+      <header class="topbar">
+        <div class="brand">Backend exercise idk</div>
+        <div class="controls">
+          <button
+            id="btn-new-post"
+            class="topbar-btn icon-btn"
+            title="Create post"
+            style="display: none"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M8 2v12M2 8h12"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+            </svg>
+          </button>
+          <!-- shown when logged out -->
+          <button id="btn-create-account" class="topbar-btn signup-btn">
+            Sign up
+          </button>
+          <!-- shown when logged in: avatar button that opens dropdown -->
+          <button
+            id="btn-profile"
+            class="topbar-btn avatar-btn"
+            title="Account"
+            style="display: none"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >
+            <img
+              id="topbar-pfp"
+              class="topbar-pfp"
+              src=""
+              alt="Your profile picture"
+            />
+          </button>
+        </div>
+      </header>
+
+      <!-- profile dropdown -->
+      <div id="profile-dropdown" class="profile-dropdown hidden" role="menu">
+        <div class="dropdown-header">
+          <img id="dropdown-pfp" class="dropdown-pfp" src="" alt="" />
+          <div>
+            <div id="dropdown-username" class="dropdown-username"></div>
+            <div class="dropdown-sub">Your account</div>
+          </div>
+        </div>
+        <div class="dropdown-divider"></div>
+        <button class="dropdown-item" id="dropdown-edit">
+          <svg
+            width="15"
+            height="15"
+            viewBox="0 0 15 15"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <path
+              d="M10.586 1.586a2 2 0 0 1 2.828 2.828l-8.5 8.5A2 2 0 0 1 3.5 13.5H2a.5.5 0 0 1-.5-.5v-1.5a2 2 0 0 1 .586-1.414l8.5-8.5Z"
+              stroke="currentColor"
+              stroke-width="1.3"
+              stroke-linejoin="round"
+            />
+          </svg>
+          Edit profile
+        </button>
+        <button class="dropdown-item danger" id="dropdown-logout">
+          <svg
+            width="15"
+            height="15"
+            viewBox="0 0 15 15"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <path
+              d="M5.5 7.5h7m0 0-2.5-2.5m2.5 2.5-2.5 2.5M9.5 3V2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-1"
+              stroke="currentColor"
+              stroke-width="1.3"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          Log out
+        </button>
+      </div>
+
+      <main id="feed" class="feed"></main>
+    </div>
+
+    <!-- backdrop -->
+    <div id="modal-backdrop" class="modal-backdrop hidden"></div>
+
+    <!-- CREATE ACCOUNT -->
+    <div
+      id="modal-account"
+      class="modal hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="acct-title"
+    >
+      <h2 id="acct-title">Create account</h2>
+      <label>
+        Username
+        <input
+          id="acct-username"
+          placeholder="Choose a username"
+          autocomplete="username"
+        />
+      </label>
+      <label>
+        Profile picture <span class="label-hint">(optional)</span>
+        <input id="acct-pfp" type="file" accept="image/*" />
+      </label>
+      <div class="pfp-preview-wrap">
+        <img
+          id="acct-pfp-preview"
+          class="pfp-preview"
+          style="display: none"
+          alt="preview"
+        />
+      </div>
+      <div class="modal-actions">
+        <button id="acct-save" class="primary">Create account</button>
+        <button id="acct-cancel" class="secondary">Cancel</button>
+      </div>
+    </div>
+
+    <!-- NEW POST -->
+    <div
+      id="modal-post"
+      class="modal hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="post-title-label"
+    >
+      <h2 id="post-title-label">New post</h2>
+      <label>
+        Title
+        <input id="post-title" maxlength="120" placeholder="Give it a title" />
+      </label>
+      <label>
+        Description
+        <textarea
+          id="post-desc"
+          placeholder="Write more... (optional)"
+        ></textarea>
+      </label>
+      <label>
+        Image <span class="label-hint">(optional)</span>
+        <input id="post-image" type="file" accept="image/*" />
+      </label>
+      <div class="pfp-preview-wrap">
+        <img
+          id="post-image-preview"
+          class="post-img-preview"
+          style="display: none"
+          alt="preview"
+        />
+      </div>
+      <div class="modal-actions">
+        <button id="post-submit" class="primary">Post</button>
+        <button id="post-cancel" class="secondary">Cancel</button>
+      </div>
+    </div>
+
+    <!-- EDIT PROFILE -->
+    <div
+      id="modal-edit"
+      class="modal hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="edit-title"
+    >
+      <h2 id="edit-title">Edit profile</h2>
+      <label>
+        Username
+        <input id="edit-username" autocomplete="username" />
+      </label>
+      <label>
+        Profile picture
+        <input id="edit-pfp" type="file" accept="image/*" />
+      </label>
+      <div class="pfp-preview-wrap">
+        <img
+          id="edit-pfp-preview"
+          class="pfp-preview"
+          style="display: none"
+          alt="preview"
+        />
+      </div>
+      <div class="modal-actions">
+        <button id="edit-save" class="primary">Save changes</button>
+        <button id="edit-cancel" class="secondary">Cancel</button>
+      </div>
+    </div>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
