@@ -32,28 +32,25 @@ function fileToBase64(file) {
 }
 
 function wireImagePicker(inputEl, previewEl) {
-    let currentBase64 = null;
+    let currentFile = null;
 
     inputEl.addEventListener("change", () => {
         const file = inputEl.files[0];
         if (!file) return;
-        fileToBase64(file)
-            .then((b64) => {
-                currentBase64 = b64;
-                previewEl.src = b64;
-                previewEl.style.display = "block";
-            })
-            .catch(() => {
-                alert("Could not read image file.");
-            });
+
+        currentFile = file;
+
+        const url = URL.createObjectURL(file);
+        previewEl.src = url;
+        previewEl.style.display = "block";
     });
 
     return {
         get value() {
-            return currentBase64;
+            return currentFile;
         },
         reset() {
-            currentBase64 = null;
+            currentFile = null;
             inputEl.value = "";
             previewEl.src = "";
             previewEl.style.display = "none";
@@ -91,7 +88,7 @@ function promptForAPI() {
     return normalized;
 }
 
-const API = "https://deal-postage-molecules-retailer.trycloudflare.com"
+const API = "https://fragrance-criticism-tablet-louisville.trycloudflare.com"
 
 // ─── State ───────────────────────────────────────────────────────────────────
 
@@ -560,12 +557,18 @@ async function register(username, pfp) {
     if (!username.trim()) return alert("Username is required.");
 
     try {
+        let pfpUrl = null;
+
+        if (pfp) {
+            pfpUrl = await uploadImage(pfp); // <-- uses your /upload route
+        }
+
         const r = await fetch(`${API}/auth/register`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 username: username.trim(),
-                pfp: pfp || null,
+                pfp: pfpUrl,
             }),
         });
 
@@ -580,7 +583,6 @@ async function register(username, pfp) {
         qs("#acct-username").value = "";
 
         renderTopbar();
-        // First login — do a real load to populate the feed with compose boxes
         await loadFeed();
     } catch {
         alert("Could not reach the server.");
@@ -665,6 +667,12 @@ async function createPost(title, description, image) {
     if (!title.trim()) return alert("Title is required.");
 
     try {
+        let imageUrl = null;
+
+        if (image instanceof File) {
+            imageUrl = await uploadImage(image);
+        }
+
         const r = await fetch(`${API}/posts`, {
             method: "POST",
             headers: {
@@ -674,7 +682,7 @@ async function createPost(title, description, image) {
             body: JSON.stringify({
                 title: title.trim(),
                 description: description.trim() || null,
-                image: image || null,
+                image: imageUrl,
             }),
         });
 
@@ -683,10 +691,7 @@ async function createPost(title, description, image) {
 
         closeModals();
         postImagePicker.reset();
-        qs("#post-title").value = "";
-        qs("#post-desc").value = "";
 
-        // Build a full post object and prepend it — no network round-trip needed
         const newPost = {
             ...data,
             authorName: account.username,
@@ -697,13 +702,7 @@ async function createPost(title, description, image) {
         };
 
         posts.unshift(newPost);
-
-        // Remove the "no posts" placeholder if present
-        const empty = el.feed.querySelector("p");
-        if (empty) empty.remove();
-
-        const card = buildCard(newPost);
-        el.feed.insertBefore(card, el.feed.firstChild);
+        el.feed.insertBefore(buildCard(newPost), el.feed.firstChild);
     } catch {
         alert("Could not reach the server.");
     }
@@ -775,6 +774,19 @@ async function init() {
     await autoLogin();
     renderTopbar();
     await loadFeed();
+}
+
+async function uploadImage(file) {
+    const form = new FormData();
+    form.append("image", file);
+
+    const r = await fetch(`${API}/upload`, {
+        method: "POST",
+        body: form,
+    });
+
+    const data = await r.json();
+    return data.url; // /uploads/abc.webp
 }
 
 init();
