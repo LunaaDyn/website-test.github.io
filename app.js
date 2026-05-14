@@ -91,9 +91,7 @@ function promptForAPI() {
     return normalized;
 }
 
-const API =
-    normalizeAPI(localStorage.getItem("apiBase")) ||
-    normalizeAPI(promptForAPI());
+const API = "https://deal-postage-molecules-retailer.trycloudflare.com"
 
 // ─── State ───────────────────────────────────────────────────────────────────
 
