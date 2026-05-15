@@ -601,6 +601,10 @@ async function updateProfile(username, pfp) {
     body.pfp = await uploadImage(pfp);
     }
 
+    console.log("PATCH BODY:", body);
+    console.log("PFP TYPE:", typeof body.pfp);
+    console.log("PFP VALUE:", body.pfp);
+
     if (!Object.keys(body).length) {
         closeModals();
         return;
