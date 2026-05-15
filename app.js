@@ -282,7 +282,7 @@ function buildCard(post) {
     const avatarImg = document.createElement("img");
     avatarImg.className = "pfp";
     avatarImg.alt = `${author}'s avatar`;
-    avatarImg.src = pfpSrc;
+    avatarImg.src = `${API}/uploads/${pfpSrc}`;
 
     const upBtn = document.createElement("button");
     upBtn.type = "button";
