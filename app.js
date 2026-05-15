@@ -282,7 +282,7 @@ function buildCard(post) {
     const avatarImg = document.createElement("img");
     avatarImg.className = "pfp";
     avatarImg.alt = `${author}'s avatar`;
-    avatarImg.src = `${API}/uploads/${pfpSrc}`;
+    avatarImg.src = resolveUrl(pfpSrc);
 
     const upBtn = document.createElement("button");
     upBtn.type = "button";
@@ -342,7 +342,7 @@ function buildCard(post) {
         img.className = "post-image";
         img.alt = "Post image";
         img.loading = "lazy";
-        img.src = `${API}/uploads/${post.image}`;
+        img.src = resolveUrl(post.image);
         main.appendChild(img);
     }
 
@@ -445,7 +445,7 @@ function buildCommentNode(c) {
     const pfpImg = document.createElement("img");
     pfpImg.className = "c-pfp";
     pfpImg.alt = `${name}'s avatar`;
-    pfpImg.src = `${API}/uploads/${pfpSrc}`;
+    pfpImg.src = resolveUrl(pfpSrc);
 
     const body = document.createElement("div");
     body.className = "c-body";
@@ -641,7 +641,7 @@ async function updateProfile(username, pfp) {
 
             // Compose row pfp on every card
             qsa(".comment-compose img").forEach((img) => {
-                img.src = newPfp;
+                img.src = resolveUrl(newPfp);
             });
 
             // Comment nodes authored by this user
@@ -787,6 +787,22 @@ async function uploadImage(file) {
 
     const data = await r.json();
     return data.url; // /uploads/abc.webp
+}
+
+function resolveUrl(path) {
+    if (!path) return "";
+
+    // already absolute URL
+    if (path.startsWith("http")) return path;
+
+    // already correct API-relative path
+    if (path.startsWith("/uploads/")) return `${API}${path}`;
+
+    // raw filename only
+    if (path.startsWith("uploads/")) return `${API}/${path}`;
+
+    // fallback
+    return `${API}/uploads/${path}`;
 }
 
 init();
