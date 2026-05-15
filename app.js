@@ -88,7 +88,7 @@ function promptForAPI() {
     return normalized;
 }
 
-const API = "https://fragrance-criticism-tablet-louisville.trycloudflare.com"
+const API = "https://collectors-grown-political-next.trycloudflare.com"
 
 // ─── State ───────────────────────────────────────────────────────────────────
 
