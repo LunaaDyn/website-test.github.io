@@ -210,8 +210,8 @@ function renderTopbar() {
     el.profileBtn.style.display = "inline-flex";
 
     const pfp = account.pfp || defaultPfpFor(account.username || "u");
-    el.topbarPfp.src = pfp;
-    el.dropdownPfp.src = pfp;
+    el.topbarPfp.src = function resolveUrl(pfp);
+    el.dropdownPfp.src = function resolveUrl(pfp);
     el.dropdownUsername.textContent = account.username;
 }
 
