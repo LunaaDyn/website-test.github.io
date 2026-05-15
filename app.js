@@ -597,7 +597,9 @@ async function updateProfile(username, pfp) {
 
     if (username && username.trim() !== account.username)
         body.username = username.trim();
-    if (pfp) body.pfp = pfp;
+    if (pfp instanceof File) {
+    body.pfp = await uploadImage(pfp);
+    }
 
     if (!Object.keys(body).length) {
         closeModals();
