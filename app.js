@@ -342,9 +342,7 @@ function buildCard(post) {
         img.className = "post-image";
         img.alt = "Post image";
         img.loading = "lazy";
-        img.src = post.image?.startsWith("http")
-    ? post.image
-    : `${API}${post.image}`;
+        img.src = `${API}/uploads/${post.image}`;
         main.appendChild(img);
     }
 
