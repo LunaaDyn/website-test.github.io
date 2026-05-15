@@ -445,7 +445,7 @@ function buildCommentNode(c) {
     const pfpImg = document.createElement("img");
     pfpImg.className = "c-pfp";
     pfpImg.alt = `${name}'s avatar`;
-    pfpImg.src = pfpSrc;
+    pfpImg.src = `${API}/uploads/${pfpSrc}`;
 
     const body = document.createElement("div");
     body.className = "c-body";
